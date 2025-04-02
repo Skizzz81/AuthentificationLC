@@ -2,7 +2,8 @@ const express = require('express');
 const { createUser, verifyPassword } = require('../auth');
 
 const router = express.Router(); // Utilisation d'un routeur Express
-
+const jwt = require('jsonwebtoken');
+const SECRET_KEY = 'your_secret_key';
 
 router.post('/signup', (req, res) => {
     const { username, password } = req.body;
@@ -43,7 +44,9 @@ router.post('/signin', (req, res) => {
 
         if (isMatch) {
             console.log('Mot de passe valide !');
-           
+            const token = jwt.sign({ username }, SECRET_KEY, { expiresIn: '1h' });
+            res.cookie('token', token, { httpOnly: true, secure: false });
+
             return res.status(200).render('signInForm', { status: 200, message: 'Identifiant valides ! ' });
         } else {
             console.log('Mot de passe invalide.');
