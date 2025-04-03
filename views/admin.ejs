@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+<body>
+    <h1>Welcome to the Admin Page, <%= user.username %>!</h1>
+    <p>You are authenticated and have admin access.</p>
+
+
+<form action="/dashboard" method="GET">
+        <button type="submit">Go to Dashboard</button>
+</form>
+
+        <br><br>
+
+    <form action="/logout" method="GET">
+        <button type="submit">Logout</button>
+    </form>
+    
+</body>
+</html>

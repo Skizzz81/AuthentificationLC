@@ -4,8 +4,7 @@ const connection = require('./db/dbconnection');
 
 function verifyPassword(username, plainPassword, callback) {
    
-    const query = 'SELECT password FROM user WHERE name = ?';
-    connection.query(query, [username], (err, results) => {
+    connection.query('SELECT * FROM user WHERE name = ?', [username], (err, results) => {
         if (err) {
             return callback(err, null);
         }
@@ -14,14 +13,20 @@ function verifyPassword(username, plainPassword, callback) {
             return callback(new Error('Utilisateur non trouvé'), null);
         }
 
-        const hashedPassword = results[0].password;
+        const user = results[0];
 
-     
-        bcrypt.compare(plainPassword, hashedPassword, (err, isMatch) => {
+        // Vérifier le mot de passe
+        bcrypt.compare(plainPassword, user.password, (err, isMatch) => {
             if (err) {
                 return callback(err, null);
             }
-            callback(null, isMatch); 
+
+            if (isMatch) {
+                // Retourner l'utilisateur si le mot de passe est valide
+                return callback(null, user);
+            } else {
+                return callback(null, null);
+            }
         });
     });
 }

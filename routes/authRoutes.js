@@ -31,27 +31,32 @@ router.post('/signin', (req, res) => {
     const { username, password } = req.body;
 
     if (!username || !password) {
-
         // Passer un message d'erreur à la vue
-        return res.status(400).render('signInForm', { status: 400, message: 'Username et  password requis' });
+        return res.status(400).render('signInForm', { status: 400, message: 'Username et password requis' });
     }
 
-    verifyPassword(username, password, (err, isMatch) => {
+    verifyPassword(username, password, (err, user) => {
         if (err) {
             console.error('Erreur :', err.message);
-            return res.status(500).render('signInForm', { status: 500, message: 'usernamme ou password incorrecte' });
+            return res.status(500).render('signInForm', { status: 500, message: 'Erreur interne du serveur' });
         }
 
-        if (isMatch) {
+        if (user) {
             console.log('Mot de passe valide !');
-            const token = jwt.sign({ username }, SECRET_KEY, { expiresIn: '1h' });
+
+            // Générer le token JWT avec les informations de l'utilisateur
+            const token = jwt.sign(
+                { id: user.id, username: user.name, role: user.role_id },
+                SECRET_KEY,
+                { expiresIn: '1h' }
+            );
+
             res.cookie('token', token, { httpOnly: true, secure: false });
 
-            return res.status(200).render('signInForm', { status: 200, message: 'Identifiant valides ! ' });
+            return res.status(200).render('signInForm', { status: 200, message: 'Identifiants valides !' });
         } else {
             console.log('Mot de passe invalide.');
-           
-            return res.status(401).render('signInForm', { status: 401, message: 'Identifiant invalides !' });
+            return res.status(401).render('signInForm', { status: 401, message: 'Identifiants invalides !' });
         }
     });
 });
